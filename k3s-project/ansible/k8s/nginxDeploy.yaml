@@ -1,0 +1,37 @@
+# Manifest to deploy a simple Nginx application with High Availability (3 Replicas)
+# This will force the Kubernetes scheduler to distribute the pods across the Master and Worker nodes.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-ha-deployment
+  labels:
+    app: nginx-ha
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx-ha
+  template:
+    metadata:
+      labels:
+        app: nginx-ha
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:stable-alpine
+        ports:
+        - containerPort: 80
+---
+# Minimal service to expose the deployment 
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-ha-service
+spec:
+  selector:
+    app: nginx-ha
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: NodePort

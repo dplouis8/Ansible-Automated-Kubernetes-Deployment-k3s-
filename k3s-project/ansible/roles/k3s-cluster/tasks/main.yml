@@ -1,0 +1,40 @@
+---
+- name: Set leader IP as a fact for all hosts
+  ansible.builtin.set_fact:
+    k3s_leader_ip: "{{ groups['leader'][0] }}"
+  run_once: true # This ensures the calculation happens once, but the fact is available everywhere
+
+- name: Install k3s server on the master node
+  ansible.builtin.shell:
+    cmd: > 
+      curl -sfL https://get.k3s.io | sh -s - server --cluster-init
+  when: "inventory_hostname == groups['leader'][0]"
+
+- name: Fix Kubeconfig Permissions
+  ansible.builtin.file:
+    path: /etc/rancher/k3s/k3s.yaml
+    mode: '0644'
+  when: "inventory_hostname == groups['leader'][0]"
+
+
+- name: Get Token from leader node
+  ansible.builtin.shell:
+    cmd: >
+      sudo cat /var/lib/rancher/k3s/server/node-token
+  register: k3s_token_output
+  when: "inventory_hostname == groups['leader'][0]"
+
+- name: Set token fact for workers
+  ansible.builtin.set_fact:
+    k3s_token: "{{ k3s_token_output.stdout }}"
+  when: k3s_token_output.stdout is defined
+  run_once: true # Ensure this fact is globally available
+
+- name: Install k3s on worker nodes
+  ansible.builtin.shell:
+    cmd: >
+      curl -sfL https://get.k3s.io | K3S_URL=https://{{ k3s_leader_ip }}:6443 K3S_TOKEN={{ k3s_token }} sh -s - agent
+  when: "inventory_hostname in groups['workers']"
+
+# - name: Run verification checks
+#   ansible.builtin.include_tasks: verify.yml

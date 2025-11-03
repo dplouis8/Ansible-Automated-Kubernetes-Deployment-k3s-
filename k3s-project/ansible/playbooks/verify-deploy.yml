@@ -1,0 +1,7 @@
+---
+- name: Verify K3s Cluster Status
+  hosts: leader
+  gather_facts: true
+  become: true 
+  roles:
+    - verify-deploy

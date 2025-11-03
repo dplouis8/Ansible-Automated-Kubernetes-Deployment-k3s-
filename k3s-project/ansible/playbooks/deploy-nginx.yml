@@ -1,0 +1,7 @@
+---
+- name: Apply Nginx HA Deployment to Cluster 
+  hosts: leader
+  gather_facts: true
+  become: true 
+  roles:
+    - nginx-deploy

@@ -1,0 +1,18 @@
+---
+- name: Configure k3s cluster
+  hosts: k3s-cluster
+  gather_facts: true
+  become: yes
+  tasks:
+    - name: Install Python
+      ansible.builtin.raw: test -e /usr/bin/python || (apt -qqy update && apt install -qqy python-is-python3)
+      changed_when: false
+
+- name: Install k3s and verify cluster
+  hosts: k3s-cluster
+  gather_facts: false
+  become: yes
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+  roles:
+    - k3s-cluster

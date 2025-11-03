@@ -1,0 +1,18 @@
+---
+# - name: Verify K3s Cluster Status
+#   hosts: leader
+#   gather_facts: true
+#   become: true 
+
+#   tasks:      
+- name: Verify cluster with kubectl
+  ansible.builtin.command:
+    cmd: "/usr/local/bin/kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml get nodes"
+  register: kubectl_output
+  changed_when: false
+
+- name: Display kubectl output
+  ansible.builtin.debug:
+    var: kubectl_output.stdout_lines
+  run_once: true
+  delegate_to: localhost
