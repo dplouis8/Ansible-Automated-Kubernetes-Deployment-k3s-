@@ -16,3 +16,27 @@
     var: deploy_output.stdout_lines
   run_once: true
   delegate_to: localhost
+
+- name: Verify HA app Deployment with kubectl
+  ansible.builtin.command:
+    cmd: "/usr/local/bin/kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml get pods"
+  register: pods_output
+  changed_when: false
+
+- name: Display kubectl output
+  ansible.builtin.debug:
+    var: pods_output.stdout_lines
+  run_once: true
+  delegate_to: localhost
+
+- name: Verify Deployment Service with kubectl
+  ansible.builtin.command:
+    cmd: "/usr/local/bin/kubectl --kubeconfig=/etc/rancher/k3s/k3s.yaml get svc"
+  register: svc_output
+  changed_when: false
+
+- name: Display kubectl output
+  ansible.builtin.debug:
+    var: svc_output.stdout_lines
+  run_once: true
+  delegate_to: localhost

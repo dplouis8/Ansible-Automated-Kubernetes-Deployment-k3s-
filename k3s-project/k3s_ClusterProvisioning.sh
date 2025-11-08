@@ -112,6 +112,7 @@ multipass shell "$CONTROL_VM_NAME" << EOF
     cd /home/ubuntu/k3s-project/
     ansible-playbook -i inventory/hosts.ini playbooks/k3s-install.yml
     ansible-playbook -i inventory/hosts.ini playbooks/verify-deploy.yml
+    ansible-playbook -i inventory/hosts.ini playbooks/deploy-nginx.yml
     echo "Ansible playbook execution finished."
     exit
 EOF
